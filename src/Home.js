@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-// import { Link, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AuthHome from "./AuthHome";
 import AuthHomeNo from "./AuthHomeNo";
@@ -11,13 +11,27 @@ function Home() {
   const [message, setMessage] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [siteUID, setSiteUID] = useState("");
+
+  // var siteUID = "";
+  const { state } = useLocation();
 
   axios.defaults.withCredentials = true;
   useEffect(() => {
+    //retrieve site UID
+    if (state === null) {
+      alert("You cannot call this page directly, please login or register");
+    } else {
+      const { siteUID } = state;
+      // console.log("siteUID: ", siteUID);
+      setSiteUID(siteUID);
+    }
+
+    //call protective page
     axios
-      .get("http://localhost:8081/home")
+      .post("http://localhost:8081/home", { siteUID: siteUID })
       .then((res) => {
-        console.log(res);
+        console.log("home: ", res);
         if (res.data.status === "Success") {
           setAuth(true);
           let name = res.data.name;
@@ -25,14 +39,13 @@ function Home() {
 
           setFirstName(nameArray[0]);
           setLastName(nameArray[1]);
-          // navigate("/login");
         } else {
           setAuth(false);
           setMessage(res.data.status);
         }
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [state, siteUID]);
 
   return (
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">

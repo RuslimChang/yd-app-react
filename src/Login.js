@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Validation from "./LoginValidation";
+import validation from "./LoginValidation";
 import axios from "axios";
 
 function Login() {
-  const [values, setValues] = useState({
+  const initValues = {
     email: "",
     password: "",
-  });
+  };
+  const [values, setValues] = useState(initValues);
+  const [errors, setErrors] = useState(initValues);
   const navigate = useNavigate();
-  axios.defaults.withCredentials = true;
-  const [errors, setErrors] = useState({ email: "", password: "" });
+
+  //handle input
   const handleInput = (event) => {
     setValues((prev) => ({
       ...prev,
@@ -18,15 +20,91 @@ function Login() {
     }));
   };
 
+  //handle submit
+  axios.defaults.withCredentials = true;
   const handleSubmit = (event) => {
     event.preventDefault();
-    setErrors(Validation(values));
+    setErrors(validation(values));
     if (errors.email === "" && errors.password === "") {
+      //call initLogin REGISTRATION system API
       axios
-        .post("http://localhost:8081/login", values)
+        .post("http://localhost:8081/initLogin", values)
         .then((res) => {
+          console.log("initLogin: ", res);
           if (res.data.status === "Success") {
-            navigate("/home");
+            let siteUID = res.data.siteUID;
+            console.log(siteUID);
+            let formdata = new FormData();
+            formdata.append("siteUID", siteUID);
+            axios
+              .post("http://localhost:8000/cdc/accounts.notifyLogin", formdata)
+              .then((res) => {
+                console.log("notifyLogin: ", res);
+                if (res.status === 200) {
+                  if (res.data.errorCode === 206001) {
+                    let consentInfo = {};
+                    consentInfo.errorDetails = res.data.errorDetails;
+                    consentInfo.regToken = res.data.regToken;
+
+                    //call accounts.getSchema CDC API
+                    let formdata = new FormData();
+                    formdata.append("include", "preferencesSchema");
+                    axios
+                      .post(
+                        "http://localhost:8000/cdc/accounts.getSchema",
+                        formdata
+                      )
+                      .then((res) => {
+                        console.log("getSchema: ", res);
+                        if (res.data.errorCode === 0) {
+                          consentInfo.currentTermsDocVersion =
+                            res.data.preferencesSchema.fields[
+                              "terms.shop"
+                            ].currentDocVersion;
+                          consentInfo.currentTermsDocUrl =
+                            res.data.preferencesSchema.fields[
+                              "terms.shop"
+                            ].legalStatements.en.documentUrl;
+                          consentInfo.currentPrivacyDocVersion =
+                            res.data.preferencesSchema.fields[
+                              "privacy.shop"
+                            ].currentDocVersion;
+                          consentInfo.currentPrivacyDocUrl =
+                            res.data.preferencesSchema.fields[
+                              "privacy.shop"
+                            ].legalStatements.en.documentUrl;
+
+                          navigate("/consent", {
+                            state: {
+                              consentInfo: consentInfo,
+                              siteUID: siteUID,
+                            },
+                          });
+                        }
+                      });
+                  } else if (res.data.errorCode === 0) {
+                    //call finalLogin REGISTRATION system API
+                    axios
+                      .post("http://localhost:8081/finalLogin", {
+                        siteUID: siteUID,
+                      })
+                      .then((res) => {
+                        console.log("finalLogin: ", res);
+                        if (res.data.status === "Success") {
+                          navigate("/home", {
+                            state: {
+                              siteUID: siteUID,
+                            },
+                          });
+                        } else {
+                          alert(res.data.status);
+                        }
+                      })
+                      .catch((err) => console.log(err));
+                  }
+                }
+              })
+              .catch((err) => console.log(err));
           } else {
             alert(res.data.status);
           }
@@ -48,6 +126,7 @@ function Login() {
               id="email"
               type="email"
               name="email"
+              // value="ruslim@sap.com"
               placeholder="Enter Email"
               onChange={handleInput}
               className="form-control rounded-3"
@@ -64,6 +143,7 @@ function Login() {
               id="password"
               type="password"
               name="password"
+              // value="Welcome1!"
               placeholder="Enter Password"
               onChange={handleInput}
               className="form-control rounded-3"
@@ -77,7 +157,7 @@ function Login() {
           </button>
           {/* <p>You agree to our terms and policies</p> */}
           <Link
-            to="/signup"
+            to="/register"
             className="btn btn-default border w-100 bg-light text-decoration-none"
           >
             Sign Up

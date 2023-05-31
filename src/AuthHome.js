@@ -16,7 +16,7 @@ function AuthHome({ firstName, lastName }) {
         <h3 className="text-center">
           Welcome - {firstName} {lastName}
         </h3>
-        <p className="">
+        <p>
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptatibus
           esse distinctio, voluptatum ab aliquam porro quisquam pariatur
           necessitatibus corporis voluptas quasi vero vel, et, voluptates atque
@@ -32,7 +32,7 @@ function AuthHome({ firstName, lastName }) {
           porro quisquam pariatur necessitatibus corporis voluptas quasi vero
           vel, et, voluptates atque eos enim laboriosam mollitia?
         </p>
-        <div class="d-grid gap-2">
+        <div className="d-grid gap-2">
           <button className="btn btn-danger" onClick={handleLogout}>
             Logout
           </button>

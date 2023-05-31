@@ -1,45 +1,67 @@
-function Validation(values) {
-  let error = {};
+function validation(values, checkedTerms, checkedPrivacy) {
+  let errors = {};
 
-  const email_pattern = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  // const email_pattern = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
+  //validate email
   if (values.email === "") {
-    error.email = "Email should not be empty";
-  } else if (!email_pattern.test(values.email)) {
-    error.email = "Email is not valid";
+    errors.email = "Email should not be empty";
+    // } else if (!email_pattern.test(values.email)) {
+    //   errors.email = "Email is not valid";
   } else {
-    error.email = "";
+    errors.email = "";
   }
 
+  //validate firstName
   if (values.firstName === "") {
-    error.firstName = "First Name should not be empty";
+    errors.firstName = "First Name should not be empty";
   } else {
-    error.firstName = "";
+    errors.firstName = "";
   }
 
-  error.lastName = "";
+  //validate lastName
+  if (values.lastName === "") {
+    errors.lastName = "Last Name should not be empty";
+  } else {
+    errors.lastName = "";
+  }
 
+  //validate password
   if (values.password === "") {
-    error.password = "Password should not be empty";
+    errors.password = "Password should not be empty";
   } else if (values.password[0].length < 8) {
-    error.password = "Password length must be at least 8";
+    errors.password = "Password length must be at least 8";
   } else if (!values.password[0] === values.password2[0]) {
-    error.password = "Password is not identical ";
+    errors.password = "Password is not identical ";
   } else {
-    error.password = "";
+    errors.password = "";
   }
 
+  //validate password2
   if (values.password2 === "") {
-    error.password2 = "Re-enter password here";
+    errors.password2 = "Re-enter password here";
   } else if (values.password2[0].length < 8) {
-    error.password2 = "Password length must be at least 8";
+    errors.password2 = "Password length must be at least 8";
   } else if (!values.password2[0] === values.password[0]) {
-    error.password2 = "Password is not identical ";
+    errors.password2 = "Password is not identical ";
   } else {
-    error.password2 = "";
+    errors.password2 = "";
   }
 
-  return error;
+  //validate terms
+  if (checkedTerms) {
+    errors.checkedTerms = "";
+  } else {
+    errors.checkedTerms = "*";
+  }
+
+  //validate privacy
+  if (checkedPrivacy) {
+    errors.checkedPrivacy = "";
+  } else {
+    errors.checkedPrivacy = "*";
+  }
+  return errors;
 }
 
-export default Validation;
+export default validation;

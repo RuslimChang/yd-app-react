@@ -7,7 +7,7 @@ function AuthHomeNo({ message }) {
       <div>
         <h3 className="text-center">Welcome - Guest</h3>
         <p className="">You must login to access this page - {message}</p>
-        <div class="d-grid gap-2">
+        <div className="d-grid gap-2">
           <Link to="/login" className="btn btn-primary">
             Login
           </Link>

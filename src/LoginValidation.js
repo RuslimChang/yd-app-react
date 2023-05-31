@@ -1,16 +1,18 @@
-function Validation(values) {
+function validation(values) {
   let error = {};
 
-  const email_pattern = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  // const email_pattern = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
+  //validate email
   if (values.email === "") {
     error.email = "Email should not be empty";
-  } else if (!email_pattern.test(values.email)) {
-    error.email = "Email is not valid";
+    // } else if (!email_pattern.test(values.email)) {
+    //   error.email = "Email is not valid";
   } else {
     error.email = "";
   }
 
+  //validate password
   if (values.password === "") {
     error.password = "Password should not be empty";
     // } else if (values.password[0].length < 8) {
@@ -22,4 +24,4 @@ function Validation(values) {
   return error;
 }
 
-export default Validation;
+export default validation;
