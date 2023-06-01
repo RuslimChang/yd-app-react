@@ -32,17 +32,17 @@ function Login() {
         .then((res) => {
           console.log("initLogin: ", res);
           if (res.data.status === "Success") {
-            let siteUID = res.data.siteUID;
-            console.log(siteUID);
+            let consentInfo = {};
+            consentInfo.siteUID = res.data.siteUID;
+            // console.log(siteUID);
             let formdata = new FormData();
-            formdata.append("siteUID", siteUID);
+            formdata.append("siteUID", consentInfo.siteUID);
             axios
               .post("http://localhost:8000/cdc/accounts.notifyLogin", formdata)
               .then((res) => {
                 console.log("notifyLogin: ", res);
                 if (res.status === 200) {
                   if (res.data.errorCode === 206001) {
-                    let consentInfo = {};
                     consentInfo.errorDetails = res.data.errorDetails;
                     consentInfo.regToken = res.data.regToken;
 
@@ -75,10 +75,7 @@ function Login() {
                             ].legalStatements.en.documentUrl;
 
                           navigate("/consent", {
-                            state: {
-                              consentInfo: consentInfo,
-                              siteUID: siteUID,
-                            },
+                            state: consentInfo,
                           });
                         }
                       });
@@ -86,15 +83,13 @@ function Login() {
                     //call finalLogin REGISTRATION system API
                     axios
                       .post("http://localhost:8081/finalLogin", {
-                        siteUID: siteUID,
+                        siteUID: consentInfo.siteUID,
                       })
                       .then((res) => {
                         console.log("finalLogin: ", res);
                         if (res.data.status === "Success") {
                           navigate("/home", {
-                            state: {
-                              siteUID: siteUID,
-                            },
+                            state: consentInfo.siteUID,
                           });
                         } else {
                           alert(res.data.status);

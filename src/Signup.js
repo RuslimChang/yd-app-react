@@ -97,13 +97,14 @@ function Signup() {
     ) {
       //call initRegister REGISTRATION system API
       axios
-        .post("http://localhost:8000/custom/initRegister", values)
+        .post("http://localhost:8081/initRegister", values)
+        // .post("http://localhost:8000/custom/initRegister", values)
         .then((res) => {
           console.log("initRegister: ", res);
           if (res.data.status === "Success") {
             //call accounts.notifyLogin CDC API
             let siteUID = res.data.siteUID;
-            console.log(siteUID);
+            // console.log(siteUID);
             let formdata = new FormData();
             formdata.append("siteUID", siteUID);
             axios
@@ -164,9 +165,7 @@ function Signup() {
                                     console.log("finalRegister: ", res);
                                     if (res.data.status === "Success") {
                                       navigate("/home", {
-                                        state: {
-                                          siteUID: siteUID,
-                                        },
+                                        state: siteUID,
                                       });
                                     } else {
                                       alert(res.data.status);

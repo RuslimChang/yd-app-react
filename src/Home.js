@@ -6,30 +6,17 @@ import AuthHome from "./AuthHome";
 import AuthHomeNo from "./AuthHomeNo";
 
 function Home() {
-  // const navigate = useNavigate();
   const [auth, setAuth] = useState(false);
   const [message, setMessage] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [siteUID, setSiteUID] = useState("");
-
-  // var siteUID = "";
   const { state } = useLocation();
 
   axios.defaults.withCredentials = true;
   useEffect(() => {
-    //retrieve site UID
-    if (state === null) {
-      alert("You cannot call this page directly, please login or register");
-    } else {
-      const { siteUID } = state;
-      // console.log("siteUID: ", siteUID);
-      setSiteUID(siteUID);
-    }
-
     //call protective page
     axios
-      .post("http://localhost:8081/home", { siteUID: siteUID })
+      .post("http://localhost:8081/home", { siteUID: state })
       .then((res) => {
         console.log("home: ", res);
         if (res.data.status === "Success") {
@@ -45,7 +32,7 @@ function Home() {
         }
       })
       .catch((err) => console.log(err));
-  }, [state, siteUID]);
+  }, [state]);
 
   return (
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
